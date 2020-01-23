@@ -18,6 +18,17 @@ export default class App extends Component {
     isLoading: false,
   };
 
+  componentDidUpdate(prevProps, prevState) {
+    const { page } = this.state;
+
+    if (prevState.page !== page) {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }
+
   loadImages = (query, page) => {
     this.setState({ isLoading: true });
 
@@ -40,20 +51,14 @@ export default class App extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-
     this.loadImages(this.state.query);
 
-    this.setState({ page: 1, images: [], query: '' });
+    this.setState({ page: 1, images: [] });
   };
 
   handleLoadMoreButton = () => {
     const { query, page } = this.state;
     this.loadImages(query, page);
-
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: 'smooth',
-    });
   };
 
   render() {
@@ -61,15 +66,18 @@ export default class App extends Component {
 
     return (
       <div className={styles.App}>
-        {isLoading && <Loader />}
         <Searchbar
           handleSubmit={this.handleSubmit}
           handleChange={this.handleChange}
           query={query}
         />
         <ImageGallery images={images} />
-        {images.length > 0 && (
-          <Button handleClick={this.handleLoadMoreButton} />
+        {isLoading ? (
+          <Loader />
+        ) : (
+          images.length > 0 && (
+            <Button handleClick={this.handleLoadMoreButton} />
+          )
         )}
       </div>
     );
